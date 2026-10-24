@@ -17,15 +17,62 @@ lectures/<강의명>/
 - Poppler (`pdftoppm`): PATH에 두거나 `LECTURE_PDFTOPPM`에 실행 파일 경로를 설정한다.
 - 선택: ffmpeg (영상에서 음성 추출), `pip install -r requirements-stt.txt` (로컬 whisper 또는 Soniox 전사)
 
-## 흐름
+## 사용법
 
-1. `python pipeline/lecture.py init "<강의명>"` 후 `input/`에 자료를 넣는다.
-2. 녹음만 있으면 전사한다. 외부 앱에서 내보낸 TXT, 로컬 faster-whisper, Soniox API 중 고른다. [전사](docs/transcription.md)
-3. `prepare`가 PDF 페이지와 영상 슬라이드를 렌더링하고, 남은 의미 작업을 `work/prepare.json`에 적는다.
-4. 에이전트가 `prompts/`의 교정 프롬프트로 전사를 교정하고, 이미지와 본문 문단을 대응시켜 `work/mapping.json`을 쓴다.
-5. `apply`가 해시를 검증하며 합본을 만들고 `verify`가 결과를 점검한다.
+### 1. 에이전트에게 맡기기 (기본)
 
-에이전트에게 "강의 <강의명> 작업해줘"라고 요청하면 `AGENTS.md`가 이 순서를 안내한다. 명령 전체는 [도구 사용](docs/commands.md), 순서는 [처리 순서](docs/workflow.md)에 있다.
+강의 폴더를 만들고 자료를 넣는다.
+
+```powershell
+python pipeline/lecture.py init "algorithms-7W-1"
+```
+
+`lectures/algorithms-7W-1/input/`에 녹음 MP3 또는 영상 MP4, 교안 PDF를 넣는다. 다른 앱(Clova Note 등)으로 이미 전사했다면 그 TXT도 함께 넣는다.
+
+이 저장소를 연 코딩 에이전트에게 한 줄로 요청한다.
+
+```text
+강의 algorithms-7W-1 작업해줘
+```
+
+`AGENTS.md`가 에이전트를 안내한다. 에이전트는 `inspect`로 자료를 확인하고, 전사 TXT가 없으면 전사 경로를 물어본 뒤 `transcribe`를 실행하고, `prepare`로 PDF 페이지와 영상 슬라이드를 뽑고, `prompts/`의 프롬프트로 전사를 교정하고, 이미지를 본문 문단에 대응시켜 `work/mapping.json`을 쓴 뒤 `apply`와 `verify`까지 진행한다.
+
+끝나면 `lectures/algorithms-7W-1/output/`을 통째로 가져간다. Markdown 하나와 `images/`가 들어 있고 Obsidian, Typora 등에서 바로 열린다.
+
+### 2. 기계적인 단계만 직접 돌리기
+
+에이전트 없이 쓸 수도 있다.
+
+```powershell
+python pipeline/lecture.py transcribe "algorithms-7W-1" --media "input/lecture.mp4" --provider whisper --language ko
+python pipeline/lecture.py prepare "algorithms-7W-1"
+```
+
+`work/transcribe/`에 전사 TXT, `work/pdf-pages/`에 교안 페이지 PNG, `work/capture/`에 슬라이드 캡처가 생기고, `work/prepare.json`에 남은 의미 작업(교정, 이미지 대응)이 기록된다. 교정은 `prompts/audioscript-refiner-1.5.3.md`를 아무 LLM에 붙여 수행하고, 대응표 `work/mapping.json`을 [도구 사용](docs/commands.md)의 형식으로 쓴 뒤 `apply`와 `verify`를 실행한다.
+
+### 전사 경로
+
+| 경로 | 준비 | 비용 |
+| --- | --- | --- |
+| `external` | 외부 앱에서 내보낸 타임스탬프 TXT를 `input/`에 둔다 | 없음 |
+| `whisper` | `pip install faster-whisper` (GPU 권장) | 없음 |
+| `soniox` | `pip install httpx`, 환경 변수 `SONIOX_API_KEY` | API 과금 |
+
+셋 다 같은 형식의 TXT를 만들며, 이후 단계는 출처를 구분하지 않는다. 자세한 옵션은 [전사](docs/transcription.md)에 있다.
+
+### 단계별 명령
+
+| 명령 | 하는 일 |
+| --- | --- |
+| `init` | 강의 폴더 생성 |
+| `inspect` | 입력 자료 목록과 해시 기록 |
+| `transcribe` | 음성·영상을 타임스탬프 TXT로 |
+| `prepare` | PDF 렌더링, 영상 슬라이드 캡처, 남은 작업 기록 |
+| `capture`, `extract-pdf`, `contact-sheet` | prepare의 개별 단계와 검토용 썸네일 |
+| `apply` | 교정본과 대응표로 합본 생성 (해시 검증) |
+| `verify` | 링크·이미지·본문 보존 검사 |
+
+처리 순서는 [workflow.md](docs/workflow.md), 이미지 대응 기준은 [matching.md](docs/matching.md)에 있다.
 
 ## 설계 원칙
 
