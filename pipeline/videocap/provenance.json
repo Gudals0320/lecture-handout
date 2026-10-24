@@ -1,0 +1,16 @@
+{
+  "upstream_project": "VideoCap",
+  "source_path": "C:\\Codex\\VideoCap\\src\\capture_engine.py",
+  "source_commit": "09830fb9e4b1e18d81c74437e00a09ed5ee0fa98",
+  "sha256": "19777907227b7adcb956e12681a76b68597ec153880b72aa89baba466f913371",
+  "copied_without_modification": false,
+  "selection": "dHash adjacent grouping, last candidate, default threshold 8; adapted from queue_engine.py",
+  "dependencies": "../../requirements.txt",
+  "licenses": [
+    "LICENSE-video2slides.txt"
+  ],
+  "vendored_sha256": "783fdd4e0b5efdc504a0989dfaa1a99091be757c5921c52cf0f5c98ed0a55679",
+  "adaptations": [
+    "Two strict Path.resolve calls changed to normal resolve for Windows sandbox compatibility; explicit file/decode validation preserved."
+  ]
+}

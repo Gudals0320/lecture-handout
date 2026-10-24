@@ -1,0 +1,5 @@
+# VideoCap capture engine dependencies; pypdf is used for lecture PDFs.
+numpy==2.5.3
+opencv-python-headless==5.0.0.93
+pillow==12.3.0
+pypdf==6.10.0

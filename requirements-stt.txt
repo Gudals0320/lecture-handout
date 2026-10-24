@@ -1,0 +1,3 @@
+# Optional speech-to-text providers; install only what you use.
+faster-whisper>=1.1
+httpx>=0.27

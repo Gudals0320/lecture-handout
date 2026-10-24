@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+
+# Lecture material is personal and copyrighted; only the sample lecture is tracked.
+lectures/*
+!lectures/sample/
+lectures/sample/work/
+lectures/sample/output/
+
+# Test scratch folders
+tests/.lecture-test-*/
+
+# Personal migration record of the original lecture set
+docs/migration.json
