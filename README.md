@@ -85,3 +85,5 @@ python -m unittest discover -s tests -p "test_*.py"
 ```
 
 가져온 코드와 라이선스는 [THIRD_PARTY.md](THIRD_PARTY.md)에 있다.
+
+이 저장소의 코드는 [MIT 라이선스](LICENSE)로 배포한다. 가져온 코드의 라이선스는 [THIRD_PARTY.md](THIRD_PARTY.md)를 따른다.
